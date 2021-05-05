@@ -200,7 +200,19 @@ def internship_edit(request, post_id):
 def company_profile(request):
     cmp = request.user.company
     profile = cmp.profile
-    return render(request, 'CompanyProfile.html', {'profile':profile, 'company':cmp})
+
+    comp = Company.objects.get(email=request.user.company.email)
+    print(comp)
+    posts = Internship.objects.filter(company=comp)
+    total_internships = len(posts)
+    total_accept_student = 0
+
+    for p in posts:
+        applied_students = InternshipAppliedDB.objects.filter(internship = p.id, status = "Accept")
+        total_accept_student = total_accept_student + len(applied_students)
+
+    print("total_accept_student : ", total_accept_student)
+    return render(request, 'CompanyProfile.html', {'profile':profile, 'company':cmp, 'total_internships': total_internships, 'total_accept_student': total_accept_student})
 
 @login_required
 def company_profile_edit(request):
@@ -255,8 +267,13 @@ def post_detail(request, post_id):
     post = Internship.objects.get(id=post_id)
 
     applied = InternshipAppliedDB.objects.filter(internship_id=post_id)
+    total_applied = len(applied)
+    print("Total student applied : ", total_applied)
+    accepted = InternshipAppliedDB.objects.filter(internship_id=post_id, status= "Accept")
+    total_accepted = len(accepted)
+    print("Total intern hired : ", total_accepted)
 
-    return render(request, 'CompanyInternshipDetails.html',{'post': post, 'company': comp, 'applied':applied})
+    return render(request, 'CompanyInternshipDetails.html',{'post': post, 'company': comp, 'applied':applied, 'total_applied': total_applied, 'total_accepted': total_accepted })
 
 
 from django.core.mail import EmailMessage
@@ -272,8 +289,9 @@ def acceptStd(request, post_id, a_id):
     print(post.title)
     print(post.company)
     name = internship.student_name
-    font = ImageFont.truetype('arial.ttf', 60)
+
     img = Image.open('company/static/images/certificate.jpeg')
+    font = ImageFont.truetype('arial.ttf', 60)
     draw = ImageDraw.Draw(img)
     draw.text(xy=(403, 421), text='{}'.format(name), fill=(0, 0, 0), font=font)
     draw.text(xy=(785, 500), text='{}'.format(post.title), fill=(0, 0, 0), font=ImageFont.truetype('arial.ttf', 25))
@@ -288,6 +306,8 @@ def acceptStd(request, post_id, a_id):
     internship.save()
 
     print(internship.certificate)
+    url_p = "https://simplyintern.pythonanywhere.com\\media\\" + str(internship.certificate)
+    print(url_p)
 
     #send confirmation mail and certificate
     to=internship.student_email
@@ -366,3 +386,4 @@ def std_profile(request, std_id):
     std = Student.objects.get(id = std_id)
 
     return render(request, 'StdProfile.html', {'std': std})
+
