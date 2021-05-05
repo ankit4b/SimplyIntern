@@ -1,12 +1,12 @@
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificate Edit</title>
 
-<html>
-    <head>
-        <title>
-            Student Home Page
-        </title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'css/StudentDashboard.css' %}" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="{% static 'css/StudentProfileEdit.css' %}                                                                                                                                                                                                                                                                                                                                                                                                                                                                 " >
 
          <!-- Bootstrap -->
          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
@@ -17,12 +17,12 @@
          <!-- Font-awesome -->
          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
-         <link rel="preconnect" href="https://fonts.gstatic.com">
-         <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans&display=swap" rel="stylesheet">
-    </head>
-    <body >
 
-     <section class="py-1 fixed-top" style="background-color: rgb(1, 23, 51)">
+</head>
+<body>
+
+
+<section class="py-1 fixed-top" style="background-color: rgb(1, 23, 51)">
       <nav class="navbar navbar-expand-sm navbar-light mx-4">
         <!-- Brand/logo -->
         <a
@@ -76,123 +76,58 @@
       </nav>
     </section>
 
+        <!-- ----------------- FORM ---------------  -->
 
-        <!-- --------------- Content section ---------------- -->
+        <section class="get_in_touch" style="margin-top: 100px;">
+            <h3 class="text-center">
+                Add New Certificate
+            </h3>
+            <hr>
 
-        <section id="content" style="margin-top: 100px;">
             <div class="container">
-
-
-            <div class="p-4 mt-5" style="background-color: #fff; box-shadow: 0 8px 15px 0px rgba(0, 0, 0, 0.1); width: 80%; margin: auto;">
-                <div >
-                    <h3 class="text-center">
-                        Your Dashboard
-                    </h3>
-                    <hr style="background-color: rgb(233, 221, 221);" />
-                    <div class="row">
-                        <div class="col-3 text-center">
-                            <h5>
-                                Total internship Applied
-                            </h5>
-                            <p>
-                                {{applied}}
-                            </p>
-                        </div>
-                        <div class="col-3 text-center">
-                            <h5>
-                                Pending
-                            </h5>
-                            <p>
-                                {{pending}}
-                            </p>
-                        </div>
-                        <div class="col-3 text-center">
-                            <h5>
-                                Accepted
-                            </h5>
-                            <p>
-                                {{accepted}}
-                            </p>
-                        </div>
-                        <div class="col-3 text-center">
-                            <h5>
-                                Rejected
-                            </h5>
-                            <p>
-                                {{rejected}}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-
-            {% for post in posts %}
                 <div>
-                    <div class="p-3 my-5" style="width: 80%; margin: auto; border-radius: 10px; box-shadow: 0 8px 15px 0px rgba(0, 0, 0, 0.1); background-color: #fff;" >
-                        <div class="row">
-                            <div class="col-md-6 col-6">
-                                <h5 class="title">
-                                    {{post.internship.company.name}}-{{post.internship.title}}
-                                </h5>
-                            </div>
-                            <div class="col-md-6 col-6 text-center">
-                                <img src="/media/{{post.internship.company.profile.pic}}" alt="Company Name" style="width: 35px; height: 35px; float: right;" />
-                            </div>
+                    <form
+                    name="resumeform"
+                    id="resumeform"
+                    method="POST"
+                    enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                        <div class="form-group">
+                        <label >Title</label>
+                        <input type="text" name="title" class="form-control"  placeholder="Certificate title">
                         </div>
 
-                        <div class="text-center my-3">
-                            <p style="color: #748dad;">
-                                <i class="fa fa-home" aria-hidden="true"></i>  {{post.internship.place}}
-                            </p>
+                        <div class="form-group">
+                        <label >Company Name</label>
+                        <input type="text" name="company" class="form-control"  placeholder="Company name">
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 col-6 text-center">
-                                <p style="color: #033f8d;">
-                                     <span style=" font-weight: 600;">  Applied on
 
-                                    </span>
-                                <br>
-                                    {{post.applied_on}}
-                                </P>
-                            </div>
-                            <div class="col-md-4 col-6 text-center">
-                                <p style="color: #033f8d;">
-                                   <span style=" font-weight: 600;">  Application Status </span>
-                                <br>
-                                    {{post.status}}
-                                </P>
-                            </div>
-                            <div class="col-md-4 col-6 text-center">
-                                <p style="color: #033f8d;">
-                                    <span style=" font-weight: 600;">  Number of applicants </span>
-                                <br>
-                                    {{post.internship.no_of_applicants}}
-                                </P>
-                            </div>
-                            <div>
-                            <h6 style="float: right; margin-right: 20px;  color: #a72879; font-weight: bold;">
-                                <a href="{% url 'detail' post.internshipkey %}" style="text-decoration: none; color: #2B5EC4;">View Details</a>
-                              <i class="fa fa-chevron-right" aria-hidden="true" style="color: #2B5EC4;"></i>
-                            </h6>
-                            </div>
-
+                        <div class="form-group">
+                        <label >Certification Year</label>
+                        <input type="text" name="cyear" class="form-control"  placeholder="2021">
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                        <label >Credention id :</label>
+                        <input type="text" name="credential" class="form-control"  value="">
+                        </div>
+
+
+                        <div class="form-group" >
+                            <label >Certificate :</label>
+                            <input type="file" name="Certificate_file" style="display: block;">
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" onclick="validateForm();" class="btn btn-primary" style="width: 200px;">Submit</button>
+                        </div>
+
+                    </form>
                 </div>
-            {% endfor %}
-
-
-
-
-
-
-
-
             </div>
-
         </section>
+
 
 
         <!-- -------------------- FOOTER SECTION -------------------- -->
@@ -271,6 +206,5 @@
         </div>
     </section>
 
-
-    </body>
-    </html>
+</body>
+</html>

@@ -10,5 +10,10 @@ urlpatterns = [
     path('auth-student', views.auth_student, name='auth_student'),
     path('profile', views.profile, name='profile'),
     path('profileEdit', views.profileEdit, name='profileEdit'),
+    path('StudentCertificateAdd', views.StudentCertificateAdd, name='StudentCertificateAdd'),
     path('dashboard', views.dashboard, name='dashboard'),
+    path('token', views.token_sent, name='token_sent'),
+    path('success', views.success, name='success'),
+    path('verify/<recieved_token>', views.verify_email, name='verify_email'),
+    path('error', views.error_page, name='error_page'),
 ]
