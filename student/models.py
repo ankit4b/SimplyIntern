@@ -21,7 +21,7 @@ class Resume(models.Model):
     student = models.OneToOneField(Student, on_delete=models.CASCADE)
     address = models.CharField(blank=True, null=True, max_length=128)
     mob = models.CharField(blank=True, null=True, max_length=10)
-    skills = models.TextField(blank=True, null=True)
+    skills = models.TextField(default=" ",blank=True, null=True)
     pic = models.ImageField(upload_to="student/", blank=True, null=True)
     college = models.CharField(blank=True, null=True, max_length=128)
     grad_year = models.CharField(blank=True, null=True, max_length=10)

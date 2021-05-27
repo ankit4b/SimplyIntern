@@ -6,12 +6,17 @@ from django.http import HttpResponse , JsonResponse
 from .models import Company, Internship, Profile, InternshipAppliedDB
 from student.models import Student,Resume
 from django.contrib import messages
+from django.core.mail import EmailMessage
+
+from email.mime.image import MIMEImage
+
+from django.contrib.staticfiles import finders
+
+from django.conf import settings
 
 from PIL import Image, ImageDraw, ImageFont
-import pandas as pd
 import os
 from django.core.mail import EmailMultiAlternatives
-
 
 from django.core.mail import send_mail
  
@@ -136,7 +141,7 @@ def new_post(request):
                     # newPost = Internship(company=request.user, title='title', place='place', duration='duration', stipend='stipend', apply_by='apply_by', no_of_openings='no_of_openings', perks='perks', skills='skills', about_internship='about_internship', who_can_apply='who_can_apply')
                     newPost.save()
                     print("saved in database")
-                    recommend(skills, std,newPost.id)
+                    recommend(skills, std,newPost.id,comp,place,title)
                     return redirect(home)
             except:
                 print('4 ', request.user, request.user.company.isCompany, request.user.is_authenticated)
@@ -276,7 +281,7 @@ def post_detail(request, post_id):
     return render(request, 'CompanyInternshipDetails.html',{'post': post, 'company': comp, 'applied':applied, 'total_applied': total_applied, 'total_accepted': total_accepted })
 
 
-from django.core.mail import EmailMessage
+
 
 def acceptStd(request, post_id, a_id):
     internship = InternshipAppliedDB.objects.get(id = a_id)
@@ -300,24 +305,56 @@ def acceptStd(request, post_id, a_id):
     img_name=name+post.title
     img.save('media\student\certificates\{}.png'.format(img_name))
 
+
     path=('student\certificates\{}.png'.format(img_name))
 
+    # to = internship.student_email
+    #
+    # message = EmailMultiAlternatives(
+    #     subject="congrats",
+    #     body='The internship u hv applied have accepted ur application',
+    #     from_email='simplyintern08@gmail.com',
+    #     to=[to],
+    # )
+    # message.mixed_subtype = 'related'
+    #
+    # message.attach(logo_data())
+    #
+    # message.send(fail_silently=False)
+
+    # print("sent ")
     internship.certificate = path
     internship.save()
-
     print(internship.certificate)
-    url_p = "https://simplyintern.pythonanywhere.com\\media\\" + str(internship.certificate)
-    print(url_p)
 
     #send confirmation mail and certificate
-    to=internship.student_email
-    send_mail(
-        "congrats",
-        'The internship u hv applied have accepted ur application',
-        'simplyintern08@gmail.com',
-        [to],
-        fail_silently=False,
-    )
+    # to = internship.student_email
+    # send_mail(
+    #     "congrats",
+    #     'The internship you have applied have accepted your  application',
+    #     'simplyintern08@gmail.com',
+    #     [to],
+    #     fail_silently=False,
+    # )
+
+    url_str = "http://127.0.0.1:8000/internships/detail/"
+    url_str = url_str + str(id)
+
+    link="http://127.0.0.1:8000/media/"
+    link1 = link + str(internship.certificate)
+    ic=internship.certificate
+
+    template_txt  = render_to_string('email_template1.html',{'post': post.title,'link1':link+str(ic)})
+    template_html = render_to_string('email_template1.html',{'post': post.title,'link1':link+str(ic)})
+    to = internship.student_email
+    email = send_mail(
+                'Congratulation',
+                template_txt,
+                settings.EMAIL_HOST_USER,
+                [to],
+                html_message=template_html,
+            )
+
 
     return redirect('post-detail', post_id = post_id)
 
@@ -344,8 +381,11 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 
-def recommend(cmp_skills,std,id):
+def recommend(cmp_skills,std,id,cmp_name,place,pos):
     print("recommendation!!!!!----------------------")
+
+
+
 
     print("company skills : " ,cmp_skills)
     x = list(cmp_skills)
@@ -360,8 +400,8 @@ def recommend(cmp_skills,std,id):
         url_str=url_str+str(id)
 
         if ans >0.5:
-            template_txt = render_to_string('email_template.html', {'name':i.name,'link':url_str})
-            template_html = render_to_string('email_template.html', {'name': i.name, 'link': url_str})
+            template_txt = render_to_string('email_template.html', {'name':i.name,'link':url_str,'cmp_name':cmp_name,'pos':pos,'place':place})
+            template_html = render_to_string('email_template.html', {'name': i.name, 'link': url_str,'cmp_name':cmp_name,'pos':pos,'place':place})
 
             email=send_mail(
                 'Internship recommendation',
@@ -370,12 +410,6 @@ def recommend(cmp_skills,std,id):
                 [i.email],
                 html_message = template_html,
             )
-            # email.fail_slently=False
-            # email.send()
-
-
-            # -------------------------------
-
 
             print("successfully emailed")
         else:
